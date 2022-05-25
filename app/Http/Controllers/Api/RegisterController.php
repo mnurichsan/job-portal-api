@@ -44,7 +44,7 @@ class RegisterController extends Controller
             return ResponseBuilder::success('User Created Successfully',$dataUser,201);
 
         } catch (\Exception $e) {
-            return ResponseBuilder::error('Something Errors!',$e,400);
+            return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
         }
 
 
@@ -77,7 +77,7 @@ class RegisterController extends Controller
                 'industri'           => $request->industri,
                 'location'           => $request->location,
                 'website'            => $request->website,
-                'slug'               => Str::slug($request->name)
+                'slug'               => Str::slug($request->name." ". rand(0,100))
             ];
 
             if($request->has('image'))

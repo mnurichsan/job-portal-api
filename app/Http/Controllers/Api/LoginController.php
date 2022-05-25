@@ -38,7 +38,7 @@ class LoginController extends Controller
             return ResponseBuilder::success('User Fetch Successfully',$dataUser,201);
 
         } catch (\Exception $e) {
-            return ResponseBuilder::error('Something Errors!',$e,400);
+            return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
         }
     }
     

@@ -20,11 +20,21 @@ Route::prefix('v1')->group(function () {
     Route::post('login',[App\Http\Controllers\Api\LoginController::class,'login']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        //companyDetailRegißter
-        Route::prefix('company')->group(function () {
-            Route::post('/',[App\Http\Controllers\Api\RegisterController::class,'companyDetailRegister']);
-        });
+        //companyDetailRegister
+        Route::prefix('my-company')->group(function () {
+            Route::get('/',[App\Http\Controllers\Api\CompanyController::class,'myCompany']);
+            Route::post('/register',[App\Http\Controllers\Api\RegisterController::class,'companyDetailRegister']);
+
+            //company jobs 
+            Route::get('jobs',[\App\Http\Controllers\Api\CompanyController::class,'companyJobs']);
+            Route::prefix('/job')->group(function () {
+                Route::post('create',[\App\Http\Controllers\Api\CompanyController::class,'createJob']);
+                Route::put('edit/{id}',[App\Http\Controllers\Api\CompanyController::class,'editJob']);
+                Route::delete('delete/{id}',[\App\Http\Controllers\Api\CompanyController::class,'destroyJob']);
+            });
     });
+        
+});
 
     //Jobs
     Route::get('jobs',[App\Http\Controllers\Api\JobController::class,'index']);

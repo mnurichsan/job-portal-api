@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\TypeJob;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class JobTypeSeeder extends Seeder
 {
@@ -13,6 +15,13 @@ class JobTypeSeeder extends Seeder
      */
     public function run()
     {
-        //
+        $data = ['Full time','Magang','Part time','Freelance'];
+
+        foreach($data as $d){
+                TypeJob::create([
+                    'name' => $d,
+                    'slug' => Str::slug($d)
+                ]);
+        }
     }
 }
