@@ -84,11 +84,14 @@ class RegisterController extends Controller
 
             if($request->has('image'))
             {
-                $data['image'] =  ImageHelper::uploadImage($request->image,"candidate");
+                $data['image'] =  ImageHelper::uploadImage($request->image,"company");
             }
 
 
             $companyCreated = Company::updateOrCreate(['user_id' => Auth::user()->id],$data);
+            User::find(Auth::user()->id)->update([
+                'role' => 'Company'
+            ]);
 
             return ResponseBuilder::success('Company Created Or Updated Successfully',$companyCreated,201);
 
@@ -137,7 +140,7 @@ class RegisterController extends Controller
 
                 if($request->has('image'))
                 {
-                    $data['image'] =  ImageHelper::uploadImage($request->image,"company");
+                    $data['image'] =  ImageHelper::uploadImage($request->image,"candidate");
                 }
 
                 if($request->has('resume'))
@@ -147,6 +150,9 @@ class RegisterController extends Controller
 
 
                 $candidateCreated = Candidate::updateOrCreate(['user_id' => Auth::user()->id],$data);
+                User::find(Auth::user()->id)->update([
+                    'role' => 'Candidate'
+                ]);
 
                 return ResponseBuilder::success('Candidate User Created Or Updated Successfully',$candidateCreated,201);
 

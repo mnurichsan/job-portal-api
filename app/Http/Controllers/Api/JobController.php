@@ -16,25 +16,41 @@ class JobController extends Controller
             if($request->has('categoryId'))
             {
                 $categoryId = $request->categoryId;
-                $jobs = Job::with('category','jobType','company')->whereHas('category', function ($query) use ($categoryId){
+                $jobs = Job::with('category','jobType','company')->where('status','Open')->whereHas('category', function ($query) use ($categoryId){
                     $query->where('id',$categoryId);
                 })->get();
             }
             elseif($request->has('jobTypeId'))
             {
                 $jobTypeId = $request->jobTypeId;
-                $jobs = Job::with('category','jobType','company')->whereHas('jobType', function ($query) use ($jobTypeId){
+                $jobs = Job::with('category','jobType','company')->where('status','Open')->whereHas('jobType', function ($query) use ($jobTypeId){
                     $query->where('id',$jobTypeId);
                 })->get();
 
             }
             else{
-                $jobs = Job::with('category','jobType','company')->get();
+                $jobs = Job::where('status','Open')->with('category','jobType','company')->get();
             }
-           
+        
 
+            return ResponseBuilder::success(message:'Jobs Fetch Successfully',data:$jobs,statusCode:200);
+            
+        } catch (\Exception $e) {
+            return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
+        }
+    }
 
-            return ResponseBuilder::success(message:'Jobs Fetch Successfully',data:$jobs,statusCode:201);
+    public function show($id)
+    {
+        try {            
+            $job = Job::with('category','jobType','company')->find($id);
+            //check job is null or not
+            if(!$job)
+            {
+                return ResponseBuilder::success(message:'Job Not Found',statusCode:404);
+            }
+
+            return ResponseBuilder::success(message:'Job Fetch Successfully',data:$job,statusCode:200);
             
         } catch (\Exception $e) {
             return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);

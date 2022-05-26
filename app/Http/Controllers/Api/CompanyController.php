@@ -27,7 +27,7 @@ class CompanyController extends Controller
 
             $myCompanyJobs = Job::with('company','category','jobType')->where('company_id',$myCompany->id)->get();
 
-            return ResponseBuilder::success('My Company Jobs Fetch Successfully',$myCompanyJobs,201);
+            return ResponseBuilder::success('My Company Jobs Fetch Successfully',$myCompanyJobs,200);
 
         } catch (\Exception $e) {
             return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
@@ -43,6 +43,7 @@ class CompanyController extends Controller
                 'description'   => 'required',
                 'jobtype_id'    => 'required',
                 'category_id'   => 'required',
+                'status'        => 'required'
             ]);
 
             if($validator->fails()){
@@ -59,18 +60,36 @@ class CompanyController extends Controller
 
            $job =  Job::create([
                 'title'         => $request->title,
-                'slug'          => Str::slug($request->title." ". rand(0,100)),
+                'slug'          => Str::slug($request->title." ". Str::random(6)),
                 'description'   => $request->description,
                 'company_id'    => $myCompany->id,
                 'jobtype_id'    => $request->jobtype_id,
                 'category_id'   => $request->category_id,
-                'salary'        => $request->salary
+                'salary'        => $request->salary,
+                'status'        => $request->status
             ]);
 
             return ResponseBuilder::success('Jobs Created Successfully',$job,201);
 
 
 
+        } catch (\Exception $e) {
+            return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
+        }
+    }
+
+    public function showJob($id)
+    {
+        try {            
+            $job = Job::with('category','jobType','company')->find($id);
+            //check job is null or not
+            if(!$job)
+            {
+                return ResponseBuilder::success(message:'Job Not Found',statusCode:404);
+            }
+
+            return ResponseBuilder::success(message:'Job Fetch Successfully',data:$job,statusCode:200);
+            
         } catch (\Exception $e) {
             return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
         }
@@ -85,6 +104,7 @@ class CompanyController extends Controller
                 'description'   => 'required',
                 'jobtype_id'    => 'required',
                 'category_id'   => 'required',
+                'status'        => 'required'
             ]);
 
             if($validator->fails()){
@@ -112,13 +132,14 @@ class CompanyController extends Controller
                 'company_id'    => $myCompany->id,
                 'jobtype_id'    => $request->jobtype_id,
                 'category_id'   => $request->category_id,
-                'salary'        => $request->salary
+                'salary'        => $request->salary,
+                'status'        => $request->status
             ];
 
             //check if slug change, title is change to
             if($request->title !=  $job->title)
             {
-                $data['slug'] =  Str::slug($request->title." ". rand(0,100));
+                $data['slug'] =  Str::slug($request->title." ". Str::random(6));
             }
 
 
@@ -149,6 +170,35 @@ class CompanyController extends Controller
             return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
         }
         
+    }
+
+    public function closeJob($id)
+    {
+        try {
+           //check if company no complete the registration
+           $myUserId = Auth::user()->id;
+           $myCompany = Company::where('user_id',$myUserId)->first();
+
+           if(!$myCompany){
+               return ResponseBuilder::error(message:'Please Complete The Registration!!',statusCode: 400);
+           }
+
+           //check job is null or not
+           $job =  Job::find($id);
+
+           if(!$job){
+               return ResponseBuilder::error(message:'Job Not Found !',statusCode: 404);
+           }
+
+           $job->update([
+                'status' => 'Close'
+           ]);
+            
+            return ResponseBuilder::success(message:'Company Job Close Successfully', data:$job, statusCode: 201);
+
+        } catch (\Exception $e) {
+            return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
+        }
     }
 
 
