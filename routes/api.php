@@ -20,7 +20,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/login',[App\Http\Controllers\Api\LoginController::class,'login']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        //companyDetailRegister
+
+        //company
         Route::prefix('/my-company')->group(function () {
             Route::get('/',[App\Http\Controllers\Api\CompanyController::class,'myCompany']);
             Route::post('/register',[App\Http\Controllers\Api\RegisterController::class,'companyDetailRegister']);
@@ -35,7 +36,11 @@ Route::prefix('v1')->group(function () {
 
             //review candidate
             Route::prefix('candidate-review')->group(function () {
-                
+                Route::get('show/{jobId}',[App\Http\Controllers\Api\ReviewController::class,'showCandidate']);
+                Route::post('accepted/{candidateId}',[App\Http\Controllers\Api\ReviewController::class,'acceptedToInterview']);
+                Route::post('assessment/{candidateId}',[App\Http\Controllers\Api\ReviewController::class,'assessmentCandidate']);
+                Route::post('accepted-to-company/{candidateId}',[App\Http\Controllers\Api\ReviewController::class,'acceptedToCompany']);
+                Route::post('rejected/{candidateId}',[App\Http\Controllers\Api\ReviewController::class,'rejected']);
             });
 
          });
