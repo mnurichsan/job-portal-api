@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\ResponseBuilder;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return ResponseBuilder::success(message: 'Welcome To Job Portal API',statusCode: 200);
 });
