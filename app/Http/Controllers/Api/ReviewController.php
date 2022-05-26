@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ReviewController extends Controller
+{
+    public function review()
+    {
+        try {
+            //code...
+        } catch (\Exception $th) {
+            //throw $th;
+        }
+    }
+}

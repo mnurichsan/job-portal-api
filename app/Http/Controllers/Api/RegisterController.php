@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Helpers\ResponseBuilder;
 use App\Helpers\ImageHelper;
+use App\Helpers\FileHelper;
+use App\Models\Candidate;
 use App\Models\Company;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 class RegisterController extends Controller
 {
 
-    //company register
+    // register
     public function register(Request $request)
     {
         try {
@@ -67,10 +69,9 @@ class RegisterController extends Controller
             if($validator->fails()){
                 return ResponseBuilder::error('Validation Errors!',$validator->errors(),400);
             }
-
+           
 
             $data = [
-                'user_id'            => Auth::user()->id, 
                 'name'               => $request->name,
                 'description'        => $request->description,
                 'office_address'     => $request->office_address,
@@ -80,15 +81,16 @@ class RegisterController extends Controller
                 'slug'               => Str::slug($request->name." ". rand(0,100))
             ];
 
+
             if($request->has('image'))
             {
-                $data['image'] =  ImageHelper::uploadImage($request->image,"company");
+                $data['image'] =  ImageHelper::uploadImage($request->image,"candidate");
             }
 
 
-            $companyCreated = Company::create($data);
+            $companyCreated = Company::updateOrCreate(['user_id' => Auth::user()->id],$data);
 
-            return ResponseBuilder::success('Company Created Successfully',$companyCreated,201);
+            return ResponseBuilder::success('Company Created Or Updated Successfully',$companyCreated,201);
 
 
         } catch (\Exception $e) {
@@ -97,5 +99,61 @@ class RegisterController extends Controller
 
 
     }
+
+      //after register, candidate must fill data about themselves
+      public function candidateDetailRegister(Request $request)
+      {
+            try {
+
+                $validator = Validator::make($request->all(),[
+                    'first_name'     => 'required',
+                    'last_name'      => 'required',
+                    'phone'          => 'required',
+                    'location'       => 'required',
+                    'gender'         => 'required',
+                    'nationality'    => 'required',
+                    'image'          => 'max:2048|mimes:jpg,png,jpeg',
+                    'resume'         => 'max:2048',
+                    'age'            => 'required'
+                ]);
+
+
+                if($validator->fails()){
+                    return ResponseBuilder::error('Validation Errors!',$validator->errors(),400);
+                }
+
+                $data = [
+                    'first_name'         => $request->first_name,
+                    'last_name'          => $request->last_name,
+                    'phone'              => $request->phone,
+                    'location'           => $request->location,
+                    'gender'             => $request->gender,
+                    'nationality'        => $request->nationality,
+                    'about'              => $request->about,
+                    'age'                => $request->age
+                ];
+
+
+
+                if($request->has('image'))
+                {
+                    $data['image'] =  ImageHelper::uploadImage($request->image,"company");
+                }
+
+                if($request->has('resume'))
+                {
+                    $data['resume'] =  FileHelper::uploadFile($request->resume,"resume");
+                }
+
+
+                $candidateCreated = Candidate::updateOrCreate(['user_id' => Auth::user()->id],$data);
+
+                return ResponseBuilder::success('Candidate User Created Or Updated Successfully',$candidateCreated,201);
+
+
+            } catch (\Exception $e) {
+                return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
+            }
+      }
 
 }
