@@ -32,9 +32,9 @@ php artisan key:generate
 
 Configure DB on .env
 ```bash
-DB_CONNECTION=pgsql
+DB_CONNECTION=mysql
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_DATABASE=laravel
 DB_USERNAME=root
 DB_PASSWORD=

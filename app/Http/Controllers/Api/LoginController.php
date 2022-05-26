@@ -35,7 +35,7 @@ class LoginController extends Controller
             $dataUser = User::findOrFail($user->id);
             $dataUser['token'] = $token;
 
-            return ResponseBuilder::success('User Fetch Successfully',$dataUser,201);
+            return ResponseBuilder::success('User Fetch Successfully',$dataUser,200);
 
         } catch (\Exception $e) {
             return ResponseBuilder::error('Something Errors!',$e->getMessage(),400);
